@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ page_title }} — BeadsCraft CRM</title>
+
+    <link
+    rel="stylesheet"
+    href="{% static 'schemes/css/styles.css' %}"
+>
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>{{ page_title }}</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'schemes:scheme_list' %}"
+        >
+            Повернутися до каталогу
+        </a>
+    </div>
+</header>
+
+<main class="container form-page">
+    <section class="scheme-form-card">
+        <h2>{{ page_title }}</h2>
+
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            novalidate
+        >
+            {% csrf_token %}
+
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field }}
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+{% for field in form %}
+    <div class="model-form-field">
+        <div class="field-label">
+            {{ field.label_tag }}
+
+            {% if field.field.required %}
+                <span class="required">*</span>
+            {% endif %}
+        </div>
+
+        {{ field }}
+
+        {% if field.help_text %}
+            <small class="help-text">
+                {{ field.help_text }}
+            </small>
+        {% endif %}
+
+        {% if field.errors %}
+            <div class="field-errors">
+                {% for error in field.errors %}
+                    <p class="field-error">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
+
+            <div class="model-form-actions">
+                <button type="submit">
+                    {{ button_text }}
+                </button>
+
+               <a href="{{ cancel_url }}">
+    Скасувати
+</a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ page_title }} — BeadsCraft CRM</title>
+
+    <link
+    rel="stylesheet"
+    href="{% static 'schemes/css/styles.css' %}"
+    >
+
+    <link
+    rel="stylesheet"
+    href="{% static 'materials/css/styles.css' %}"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>{{ movement_label }} матеріалу</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'materials:material_list' %}"
+        >
+            Повернутися до складу
+        </a>
+    </div>
+</header>
+
+<main class="container form-page">
+    <section class="scheme-form-card movement-form-card">
+        <h2>{{ page_title }}</h2>
+
+        <div class="movement-material-info">
+            <p>
+                <strong>Тип:</strong>
+                {{ material.material_type.name }}
+            </p>
+
+            <p>
+                <strong>Поточний залишок:</strong>
+                {{ stock.quantity_in_stock }}
+                {{ material.get_unit_display }}
+            </p>
+
+            {% if material.color_name %}
+                <p>
+                    <strong>Колір:</strong>
+                    {{ material.color_name }}
+
+                    {% if material.color_code %}
+                        / {{ material.color_code }}
+                    {% endif %}
+                </p>
+            {% endif %}
+        </div>
+
+        {% if is_write_off %}
+            <p class="movement-warning">
+                Не можна списати більше, ніж є на складі.
+            </p>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="field-label">
+    {{ form.quantity.label_tag }}
+
+    {% if form.quantity.field.required %}
+        <span class="required">*</span>
+    {% endif %}
+</div>
+
+{{ form.quantity }}
+
+                {% for error in form.quantity.errors %}
+                    <div class="field-errors">
+                        <p class="field-error">{{ error }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="field-label">
+    {{ form.note.label_tag }}
+
+    {% if form.note.field.required %}
+        <span class="required">*</span>
+    {% endif %}
+</div>
+
+{{ form.note }}
+
+                {% for error in form.note.errors %}
+                    <div class="field-errors">
+                        <p class="field-error">{{ error }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="model-form-actions">
+                <button
+                    type="submit"
+                    {% if is_write_off %}
+                        class="movement-writeoff-button"
+                    {% endif %}
+                >
+                    {{ button_text }}
+                </button>
+
+                <a href="{% url 'materials:material_list' %}">
+                    Скасувати
+                </a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

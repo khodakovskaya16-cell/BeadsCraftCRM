@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Оформлення замовлення — BeadsCraft CRM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'schemes/css/styles.css' %}?v=10"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'shop/css/styles.css' %}?v=1"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Оформлення замовлення</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'shop:cart_detail' cart.pk %}"
+        >
+            Повернутися до кошика
+        </a>
+    </div>
+</header>
+
+<main class="container checkout-page">
+    <section class="checkout-summary">
+        <h2>Ваше замовлення</h2>
+
+        <p>
+            Схема:
+            <strong>{{ cart.scheme.title }}</strong>
+        </p>
+
+        <ul>
+            {% for item in items %}
+                <li>
+                    {{ item.material.name }}
+
+                    {% if item.material.color_name %}
+                        — {{ item.material.color_name }}
+                    {% endif %}
+
+                    :
+                    <strong>
+                        {{ item.quantity }}
+                        {{ item.material.get_unit_display }}
+                    </strong>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="checkout-form-card">
+        <h2>Дані отримувача</h2>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form.visible_fields %}
+                <div class="model-form-field">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+
+                        {% if field.field.required %}
+                            <span class="required">*</span>
+                        {% endif %}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.errors %}
+                        <div class="field-errors">
+                            {% for error in field.errors %}
+                                <p class="field-error">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="model-form-actions">
+                <button type="submit">
+                    Підтвердити замовлення
+                </button>
+
+                <a href="{% url 'shop:cart_detail' cart.pk %}">
+                    Скасувати
+                </a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

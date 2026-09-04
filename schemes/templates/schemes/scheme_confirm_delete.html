@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Видалити схему — BeadsCraft CRM</title>
+
+    <link
+    rel="stylesheet"
+    href="{% static 'schemes/css/styles.css' %}"
+>
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Видалення схеми</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'schemes:scheme_detail' scheme.pk %}"
+        >
+            Повернутися до картки
+        </a>
+    </div>
+</header>
+
+<main class="container delete-page">
+    <section class="delete-card">
+        <h2>Видалити схему?</h2>
+
+        <p>
+            Ви справді хочете видалити схему
+            <strong>«{{ scheme.title }}»</strong>?
+        </p>
+
+        <p class="delete-warning">
+            Після видалення відновити запис через сайт буде неможливо.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="delete-actions">
+                <button
+                    class="danger-button"
+                    type="submit"
+                >
+                    Так, видалити
+                </button>
+
+                <a
+                    class="secondary-link"
+                    href="{% url 'schemes:scheme_detail' scheme.pk %}"
+                >
+                    Скасувати
+                </a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

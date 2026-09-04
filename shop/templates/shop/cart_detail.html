@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Кошик — BeadsCraft CRM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'schemes/css/styles.css' %}?v=10"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'shop/css/styles.css' %}?v=3"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Кошик дефіцитних матеріалів</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'schemes:scheme_detail' cart.scheme.pk %}"
+        >
+            Повернутися до схеми
+        </a>
+    </div>
+</header>
+
+<main class="container shop-page">
+    <section class="shop-heading">
+        <div>
+            <h2>Матеріали для придбання</h2>
+
+            <p>
+                Схема:
+                <strong>{{ cart.scheme.title }}</strong>
+            </p>
+        </div>
+    </section>
+
+    {% if items %}
+        <section class="shop-card">
+            <div class="shop-table-wrapper">
+                <table class="shop-table">
+                    <thead>
+                    <tr>
+                        <th>Матеріал</th>
+                        <th>Тип</th>
+                        <th>Артикул</th>
+                        <th>Колір</th>
+                        <th>Кількість для придбання</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>
+                                <strong>
+                                    {{ item.material.name }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ item.material.material_type.name }}
+                            </td>
+
+                            <td>
+                                {{ item.material.article|default:"—" }}
+                            </td>
+
+                            <td>
+                                {% if item.material.color_name %}
+                                    {{ item.material.color_name }}
+
+                                    {% if item.material.color_code %}
+                                        <small>
+                                            {{ item.material.color_code }}
+                                        </small>
+                                    {% endif %}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ item.quantity }}
+                                    {{ item.material.get_unit_display }}
+                                </strong>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if cart.status == "active" %}
+                <div class="shop-actions">
+                    <a
+                        class="checkout-link"
+                        href="{% url 'shop:checkout' cart.pk %}"
+                    >
+                        Оформити замовлення
+                    </a>
+                </div>
+            {% else %}
+                <p class="ordered-notice">
+                    Замовлення з цього кошика вже оформлено.
+                </p>
+            {% endif %}
+        </section>
+    {% else %}
+        <section class="shop-empty">
+            <h3>Дефіцитних матеріалів немає</h3>
+
+            <p>
+                Наявного запасу достатньо для цієї схеми.
+            </p>
+
+            <a
+                class="checkout-link"
+                href="{% url 'schemes:scheme_detail' cart.scheme.pk %}"
+            >
+                Повернутися до схеми
+            </a>
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

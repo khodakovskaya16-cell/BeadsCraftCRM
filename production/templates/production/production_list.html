@@ -1,0 +1,125 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Виробництво — BeadsCraft CRM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'schemes/css/styles.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'production/css/styles.css' %}"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Виробничі завдання</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'admin:index' %}"
+        >
+            Адміністрування
+        </a>
+    </div>
+</header>
+
+{% include "includes/main_navigation.html" %}
+
+<main class="container production-page">
+    <h2>Виробництво</h2>
+
+    {% if productions %}
+        <section class="production-table-card">
+            <div class="production-table-wrapper">
+                <table class="production-table">
+                    <thead>
+                    <tr>
+                        <th>Номер</th>
+                        <th>Схема</th>
+                        <th>Кількість</th>
+                        <th>Статус</th>
+                        <th>Створено</th>
+                        <th>Дії</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for production in productions %}
+                        <tr>
+                            <td>
+                                {{ production.production_number }}
+                            </td>
+
+                            <td>
+                                {{ production.scheme.title }}
+                            </td>
+
+                            <td>
+                                {{ production.quantity }}
+                            </td>
+
+                            <td>
+                                <span
+                                    class="
+                                        production-status
+                                        status-{{ production.status }}
+                                    "
+                                >
+                                    {{ production.get_status_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ production.created_at|date:"d.m.Y H:i" }}
+                            </td>
+
+                            <td>
+                                <a
+                                    class="production-open-link"
+                                    href="{% url 'production:production_detail' production.pk %}"
+                                >
+                                    Відкрити
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% else %}
+        <section class="production-empty">
+            <h3>Виробничих завдань ще немає</h3>
+
+            <p>
+                Нове виробниче завдання можна створити зі сторінки схеми.
+            </p>
+
+            <a
+                class="primary-link"
+                href="{% url 'schemes:scheme_list' %}"
+            >
+                Перейти до схем
+            </a>
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

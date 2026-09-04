@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>BeadsCraft CRM — Каталог схем</title>
+
+    <link
+    rel="stylesheet"
+    href="{% static 'schemes/css/styles.css' %}"
+>
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Бібліотека схем для бісероплетіння</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="/admin/"
+        >
+            Адміністрування
+        </a>
+    </div>
+</header>
+
+{% include "includes/main_navigation.html" %}
+
+<main class="container">
+    <section class="catalog-heading">
+        <div>
+            <h2>Каталог схем</h2>
+            <p>Знайдено схем: {{ schemes|length }}</p>
+        </div>
+
+        <a
+            class="create-link"
+            href="{% url 'schemes:scheme_create' %}"
+        >
+            + Додати схему
+        </a>
+    </section>
+
+    <form
+        class="filter-form"
+        method="get"
+    >
+        <div class="form-field search-field">
+            <label for="q">
+                Пошук
+            </label>
+
+            <input
+                id="q"
+                name="q"
+                type="search"
+                value="{{ query }}"
+                placeholder="Назва, автор, тег або опис"
+            >
+        </div>
+
+        <div class="form-field">
+            <label for="category">
+                Категорія
+            </label>
+
+            <select
+                id="category"
+                name="category"
+            >
+                <option value="">
+                    Усі категорії
+                </option>
+
+                {% for value, label in category_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if value == selected_category %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="status">
+                Статус
+            </label>
+
+            <select
+                id="status"
+                name="status"
+            >
+                <option value="">
+                    Усі статуси
+                </option>
+
+                {% for value, label in status_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if value == selected_status %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">
+                Застосувати
+            </button>
+
+            <a href="{% url 'schemes:scheme_list' %}">
+                Очистити
+            </a>
+        </div>
+    </form>
+
+    {% if schemes %}
+        <section class="scheme-grid">
+            {% for scheme in schemes %}
+                <article class="scheme-card">
+                    <div class="scheme-image">
+                        {% if scheme.image_file %}
+                            <img
+                                src="{{ scheme.image_file.url }}"
+                                alt="{{ scheme.title }}"
+                            >
+                        {% else %}
+                            <div class="image-placeholder">
+                                Немає зображення
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="scheme-content">
+                        <div class="scheme-title-row">
+                            <h3>
+                                <a
+                                    class="scheme-title-link"
+                                    href="{% url 'schemes:scheme_detail' scheme.pk %}"
+                                >
+                                    {{ scheme.title }}
+                                </a>
+                            </h3>
+
+                            {% if scheme.is_favorite %}
+                                <span
+                                    class="favorite"
+                                    title="Обрана схема"
+                                >
+                                    ★
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <dl class="scheme-info">
+                            <div>
+                                <dt>Категорія</dt>
+                                <dd>
+                                    {{ scheme.get_category_display }}
+                                </dd>
+                            </div>
+
+                            <div>
+                                <dt>Джерело</dt>
+                                <dd>
+                                    {{ scheme.get_source_display }}
+                                </dd>
+                            </div>
+
+                            <div>
+                                <dt>Складність</dt>
+                                <dd>
+                                    {% if scheme.difficulty %}
+                                        {{ scheme.get_difficulty_display }}
+                                    {% else %}
+                                        Не вказано
+                                    {% endif %}
+                                </dd>
+                            </div>
+
+                            <div>
+                                <dt>Статус</dt>
+                                <dd>
+                                    {{ scheme.get_status_display }}
+                                </dd>
+                            </div>
+                        </dl>
+
+                        {% if scheme.description %}
+                            <p class="description">
+                                {{ scheme.description|truncatechars:140 }}
+                            </p>
+                        {% endif %}
+
+                        <div class="tags">
+                            {% for tag in scheme.tags.all %}
+                                <span>{{ tag.name }}</span>
+                            {% empty %}
+                                <span>Теги не додані</span>
+                            {% endfor %}
+                        </div>
+
+                        {% if scheme.pdf_file %}
+                            <a
+                                class="pdf-link"
+                                href="{{ scheme.pdf_file.url }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Відкрити PDF
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <section class="empty-state">
+            <h3>Схем не знайдено</h3>
+
+            <p>
+                Змініть пошуковий запит або параметри фільтрації.
+            </p>
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

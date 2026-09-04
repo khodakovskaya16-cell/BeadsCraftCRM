@@ -1,0 +1,233 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ production.production_number }} — BeadsCraft CRM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'schemes/css/styles.css' %}?v=11"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'production/css/styles.css' %}?v=1"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>{{ production.production_number }}</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'production:production_list' %}"
+        >
+            Усі завдання
+        </a>
+    </div>
+</header>
+
+<main class="container production-page">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="production-message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="production-card">
+        <div class="production-heading">
+            <div>
+                <h2>{{ production.scheme.title }}</h2>
+
+                <p>
+                    Кількість виробів:
+                    <strong>{{ production.quantity }}</strong>
+                </p>
+            </div>
+
+            <span class="production-status status-{{ production.status }}">
+                {{ production.get_status_display }}
+            </span>
+        </div>
+
+        {% if production.notes %}
+            <p>{{ production.notes }}</p>
+        {% endif %}
+
+        {% if production.status == "planned" %}
+            <h3>Необхідні матеріали</h3>
+
+            {% if requirement_rows %}
+                <div class="production-table-wrapper">
+                    <table class="production-table">
+                        <thead>
+                        <tr>
+                            <th>Матеріал</th>
+                            <th>Потрібно</th>
+                            <th>На складі</th>
+                            <th>Дефіцит</th>
+                            <th>Стан</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for row in requirement_rows %}
+                            <tr>
+                                <td>
+                                    {{ row.requirement.material }}
+                                </td>
+
+                                <td>
+                                    {{ row.required_total }}
+                                    {{ row.requirement.material.get_unit_display }}
+                                </td>
+
+                                <td>
+                                    {{ row.requirement.material.quantity_in_stock }}
+                                    {{ row.requirement.material.get_unit_display }}
+                                </td>
+
+                                <td>
+                                    {{ row.shortage }}
+                                    {{ row.requirement.material.get_unit_display }}
+                                </td>
+
+                                <td>
+                                    {% if row.available %}
+                                        <span class="production-available">
+                                            Достатньо
+                                        </span>
+                                    {% else %}
+                                        <span class="production-shortage">
+                                            Недостатньо
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>Для схеми не додано матеріалів.</p>
+            {% endif %}
+
+            <div class="production-actions">
+                <form
+                    method="post"
+                    action="{% url 'production:production_start' production.pk %}"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        class="production-start-button"
+                        type="submit"
+                        {% if not all_available %}
+                            disabled
+                        {% endif %}
+                    >
+                        Розпочати виробництво
+                    </button>
+                </form>
+
+                <form
+                    method="post"
+                    action="{% url 'production:production_cancel' production.pk %}"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        class="production-cancel-button"
+                        type="submit"
+                    >
+                        Скасувати
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <h3>Списані матеріали</h3>
+
+            <div class="production-table-wrapper">
+                <table class="production-table">
+                    <thead>
+                    <tr>
+                        <th>Матеріал</th>
+                        <th>Списано</th>
+                        <th>Залишок до</th>
+                        <th>Залишок після</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for usage in usages %}
+                        <tr>
+                            <td>
+                                {{ usage.material_name }}
+
+                                {% if usage.color_name %}
+                                    — {{ usage.color_name }}
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ usage.required_quantity }}
+                                {{ usage.unit_label }}
+                            </td>
+
+                            <td>
+                                {{ usage.balance_before }}
+                                {{ usage.unit_label }}
+                            </td>
+
+                            <td>
+                                {{ usage.balance_after }}
+                                {{ usage.unit_label }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">
+                                Матеріали не списувалися.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if production.status == "in_progress" %}
+                <div class="production-actions">
+                    <form
+                        method="post"
+                        action="{% url 'production:production_complete' production.pk %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            class="production-complete-button"
+                            type="submit"
+                        >
+                            Завершити виробництво
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>

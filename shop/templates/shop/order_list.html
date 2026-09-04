@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Замовлення — BeadsCraft CRM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'schemes/css/styles.css' %}?v=12"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'shop/css/styles.css' %}?v=4"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'dashboard/css/navigation.css' %}?v=2"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Оформлені замовлення</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'dashboard:home' %}"
+        >
+            Головна панель
+        </a>
+    </div>
+</header>
+
+{% include "includes/main_navigation.html" %}
+
+<main class="container">
+    <section class="shop-heading">
+        <div>
+            <h2>Замовлення</h2>
+
+            <p>
+                Усього: {{ orders|length }}
+            </p>
+        </div>
+    </section>
+
+    {% if orders %}
+        <section class="shop-card">
+            <div class="shop-table-wrapper">
+                <table class="shop-table">
+                    <thead>
+                    <tr>
+                        <th>Номер</th>
+                        <th>Схема</th>
+                        <th>Отримувач</th>
+                        <th>Телефон</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                        <th>Дії</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>
+                                <strong>
+                                    {{ order.order_number }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ order.cart.scheme.title }}
+                            </td>
+
+                            <td>
+                                {{ order.customer_name }}
+                            </td>
+
+                            <td>
+                                {{ order.phone }}
+                            </td>
+
+                            <td>
+                                {{ order.get_status_display }}
+                            </td>
+
+                            <td>
+                                {{ order.created_at|date:"d.m.Y H:i" }}
+                            </td>
+
+                            <td>
+                                <a
+                                    class="production-open-link"
+                                    href="{% url 'shop:order_success' order.pk %}"
+                                >
+                                    Відкрити
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% else %}
+        <section class="shop-empty">
+            <h3>Замовлень ще немає</h3>
+
+            <p>
+                Замовлення з’являться після оформлення кошика.
+            </p>
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

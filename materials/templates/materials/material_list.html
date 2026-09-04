@@ -1,0 +1,282 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Склад матеріалів — BeadsCraft CRM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'schemes/css/styles.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'materials/css/styles.css' %}"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Склад матеріалів</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'admin:index' %}"
+        >
+            Адміністрування
+        </a>
+    </div>
+</header>
+
+{% include "includes/main_navigation.html" %}
+
+<main class="container">
+    <section class="catalog-heading">
+        <div>
+            <h2>Матеріали</h2>
+
+            <p>
+                Знайдено позицій: {{ materials|length }}
+            </p>
+        </div>
+
+        <div class="catalog-actions">
+            <a
+                class="secondary-create-link"
+                href="{% url 'materials:stock_movement_list' %}"
+            >
+                Журнал руху
+            </a>
+
+            <a
+                class="create-link"
+                href="{% url 'materials:material_create' %}"
+            >
+                + Додати матеріал
+            </a>
+        </div>
+    </section>
+
+    <form
+        class="filter-form materials-filter"
+        method="get"
+    >
+        <div class="form-field search-field">
+            <label for="q">
+                Пошук
+            </label>
+
+            <input
+                id="q"
+                name="q"
+                type="search"
+                value="{{ query }}"
+                placeholder="Назва, артикул, виробник або колір"
+            >
+        </div>
+
+        <div class="form-field">
+            <label for="material_type">
+                Тип матеріалу
+            </label>
+
+            <select
+                id="material_type"
+                name="material_type"
+            >
+                <option value="">
+                    Усі типи
+                </option>
+
+                {% for material_type in material_types %}
+                    {% with material_type_id=material_type.pk|stringformat:"s" %}
+                        {% if selected_type == material_type_id %}
+                            <option
+                                value="{{ material_type.pk }}"
+                                selected
+                            >
+                                {{ material_type.name }}
+                            </option>
+                        {% else %}
+                            <option value="{{ material_type.pk }}">
+                                {{ material_type.name }}
+                            </option>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="stock">
+                Рівень запасу
+            </label>
+
+            <select
+                id="stock"
+                name="stock"
+            >
+                <option value="">
+                    Усі матеріали
+                </option>
+
+                {% if selected_stock == "low" %}
+                    <option value="low" selected>
+                        Малий запас
+                    </option>
+                {% else %}
+                    <option value="low">
+                        Малий запас
+                    </option>
+                {% endif %}
+
+                {% if selected_stock == "enough" %}
+                    <option value="enough" selected>
+                        Запас достатній
+                    </option>
+                {% else %}
+                    <option value="enough">
+                        Запас достатній
+                    </option>
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">
+                Застосувати
+            </button>
+
+            <a href="{% url 'materials:material_list' %}">
+                Очистити
+            </a>
+        </div>
+    </form>
+
+    {% if materials %}
+        <section class="material-table-card">
+            <div class="material-table-wrapper">
+                <table class="material-table">
+                    <thead>
+                    <tr>
+                        <th>Матеріал</th>
+                        <th>Тип</th>
+                        <th>Виробник</th>
+                        <th>Артикул</th>
+                        <th>Колір</th>
+                        <th>Залишок</th>
+                        <th>Мінімум</th>
+                        <th>Стан</th>
+                        <th>Дії</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for material in materials %}
+                        <tr>
+                            <td>
+                                <strong>
+                                    {{ material.name }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ material.material_type.name }}
+                            </td>
+
+                            <td>
+                                {{ material.manufacturer|default:"—" }}
+                            </td>
+
+                            <td>
+                                {{ material.article|default:"—" }}
+                            </td>
+
+                            <td>
+                                {% if material.color_name %}
+                                    {{ material.color_name }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                                {% if material.color_code %}
+                                    <small>
+                                        {{ material.color_code }}
+                                    </small>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ material.personal_quantity }}
+                                {{ material.get_unit_display }}
+                            </td>
+
+                            <td>
+                                {{ material.personal_minimum }}
+                                {{ material.get_unit_display }}
+                            </td>
+
+                            <td>
+                                {% if material.personal_is_low %}
+                                    <span class="stock-status stock-low">
+                                        Малий запас
+                                    </span>
+                                {% else %}
+                                    <span class="stock-status stock-enough">
+                                        Достатньо
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="material-actions-cell">
+                                <a
+                                    class="material-income-link"
+                                    href="{% url 'materials:stock_movement_create' material.pk 'receipt' %}"
+                                >
+                                    + Надходження
+                                </a>
+
+                                <a
+                                    class="material-writeoff-link"
+                                    href="{% url 'materials:stock_movement_create' material.pk 'write_off' %}"
+                                >
+                                    − Списання
+                                </a>
+
+                                <a
+                                    class="material-edit-link"
+                                    href="{% url 'materials:material_update' material.pk %}"
+                                >
+                                    Редагувати
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% else %}
+        <section class="empty-state">
+            <h3>Матеріалів не знайдено</h3>
+
+            <p>
+                Змініть пошук або параметри фільтрації.
+            </p>
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

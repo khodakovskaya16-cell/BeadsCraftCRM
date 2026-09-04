@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Журнал руху — BeadsCraft CRM</title>
+
+    <link
+    rel="stylesheet"
+    href="{% static 'schemes/css/styles.css' %}"
+    >
+
+    <link
+    rel="stylesheet"
+    href="{% static 'materials/css/styles.css' %}"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Журнал руху матеріалів</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'materials:material_list' %}"
+        >
+            Повернутися до складу
+        </a>
+    </div>
+</header>
+
+<main class="container">
+    <section class="catalog-heading">
+        <div>
+            <h2>Журнал руху</h2>
+
+            <p>
+                Знайдено операцій: {{ movements|length }}
+            </p>
+        </div>
+    </section>
+
+    <form
+        class="filter-form movement-filter"
+        method="get"
+    >
+        <div class="form-field search-field">
+            <label for="q">Пошук</label>
+
+            <input
+                id="q"
+                name="q"
+                type="search"
+                value="{{ query }}"
+                placeholder="Матеріал, артикул, колір або примітка"
+            >
+        </div>
+
+        <div class="form-field">
+            <label for="movement_type">
+                Тип операції
+            </label>
+
+            <select
+                id="movement_type"
+                name="movement_type"
+            >
+                <option value="">
+                    Усі операції
+                </option>
+
+                {% for value, label in movement_type_choices %}
+                    <option
+                        value="{{ value }}"
+                        {% if selected_type == value %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">
+                Застосувати
+            </button>
+
+            <a href="{% url 'materials:stock_movement_list' %}">
+                Очистити
+            </a>
+        </div>
+    </form>
+
+    {% if movements %}
+        <section class="material-table-card">
+            <div class="material-table-wrapper">
+                <table class="material-table movement-table">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Матеріал</th>
+                        <th>Операція</th>
+                        <th>Кількість</th>
+                        <th>Залишок після</th>
+                        <th>Примітка</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for movement in movements %}
+                        <tr>
+                            <td>
+                                {{ movement.created_at|date:"d.m.Y H:i" }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ movement.material.name }}
+                                </strong>
+
+                                {% if movement.material.color_name %}
+                                    <small>
+                                        {{ movement.material.color_name }}
+
+                                        {% if movement.material.color_code %}
+                                            /
+                                            {{ movement.material.color_code }}
+                                        {% endif %}
+                                    </small>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if movement.movement_type == "receipt" %}
+                                    <span class="movement-type movement-receipt">
+                                        Надходження
+                                    </span>
+                                {% else %}
+                                    <span class="movement-type movement-writeoff">
+                                        Списання
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if movement.movement_type == "receipt" %}
+                                    +
+                                {% else %}
+                                    −
+                                {% endif %}
+
+                                {{ movement.quantity }}
+                                {{ movement.material.get_unit_display }}
+                            </td>
+
+                            <td>
+                                {{ movement.balance_after }}
+                                {{ movement.material.get_unit_display }}
+                            </td>
+
+                            <td>
+                                {{ movement.note|default:"—" }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    {% else %}
+        <section class="empty-state">
+            <h3>Операцій ще немає</h3>
+
+            <p>
+                Створіть надходження або списання матеріалу.
+            </p>
+        </section>
+    {% endif %}
+</main>
+</body>
+</html>

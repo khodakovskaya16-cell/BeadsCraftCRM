@@ -1,0 +1,82 @@
+<nav class="main-navigation" aria-label="Основна навігація">
+    <div class="container main-navigation-content">
+
+        {% if request.resolver_match.namespace == "schemes" and request.resolver_match.url_name != "scheme_list" %}
+            <div class="main-navigation-context">
+                <a
+                    class="main-navigation-back"
+                    href="{% url 'schemes:scheme_list' %}"
+                >
+                    ← До бібліотеки схем
+                </a>
+            </div>
+
+        {% elif request.resolver_match.namespace == "materials" and request.resolver_match.url_name != "material_list" %}
+            <div class="main-navigation-context">
+                <a
+                    class="main-navigation-back"
+                    href="{% url 'materials:material_list' %}"
+                >
+                    ← До складу
+                </a>
+            </div>
+
+        {% elif request.resolver_match.namespace == "shop" and request.resolver_match.url_name != "order_list" %}
+            <div class="main-navigation-context">
+                <a
+                    class="main-navigation-back"
+                    href="{% url 'shop:order_list' %}"
+                >
+                    ← До замовлень
+                </a>
+            </div>
+
+        {% elif request.resolver_match.namespace == "production" and request.resolver_match.url_name != "production_list" %}
+            <div class="main-navigation-context">
+                <a
+                    class="main-navigation-back"
+                    href="{% url 'production:production_list' %}"
+                >
+                    ← До виробничих завдань
+                </a>
+            </div>
+        {% endif %}
+
+        <div class="main-navigation-links">
+            <a
+                href="{% url 'dashboard:home' %}"
+                class="{% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}"
+            >
+                Головна
+            </a>
+
+            <a
+                href="{% url 'schemes:scheme_list' %}"
+                class="{% if request.resolver_match.namespace == 'schemes' %}active{% endif %}"
+            >
+                Схеми
+            </a>
+
+            <a
+                href="{% url 'materials:material_list' %}"
+                class="{% if request.resolver_match.namespace == 'materials' %}active{% endif %}"
+            >
+                Матеріали
+            </a>
+
+            <a
+                href="{% url 'shop:order_list' %}"
+                class="{% if request.resolver_match.namespace == 'shop' %}active{% endif %}"
+            >
+                Замовлення
+            </a>
+
+            <a
+                href="{% url 'production:production_list' %}"
+                class="{% if request.resolver_match.namespace == 'production' %}active{% endif %}"
+            >
+                Виробництво
+            </a>
+        </div>
+    </div>
+</nav>

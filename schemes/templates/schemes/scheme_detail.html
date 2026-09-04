@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ scheme.title }} — BeadsCraft CRM</title>
+
+    <link
+    rel="stylesheet"
+    href="{% static 'schemes/css/styles.css' %}"
+>
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Картка схеми</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'schemes:scheme_list' %}"
+        >
+            Повернутися до каталогу
+        </a>
+    </div>
+</header>
+
+{% include "includes/main_navigation.html" %}
+
+<main class="container detail-page">
+    <article class="detail-card">
+        <div class="detail-image">
+            {% if scheme.image_file %}
+                <img
+                    src="{{ scheme.image_file.url }}"
+                    alt="{{ scheme.title }}"
+                >
+            {% else %}
+                <div class="image-placeholder">
+                    Немає зображення
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="detail-content">
+            <div class="scheme-title-row">
+                <h2>{{ scheme.title }}</h2>
+
+                {% if scheme.is_favorite %}
+                    <span
+                        class="favorite"
+                        title="Обрана схема"
+                    >
+                        ★
+                    </span>
+                {% endif %}
+            </div>
+
+            <dl class="detail-info">
+                <div>
+                    <dt>Джерело</dt>
+                    <dd>{{ scheme.get_source_display }}</dd>
+                </div>
+
+                <div>
+                    <dt>Категорія</dt>
+                    <dd>{{ scheme.get_category_display }}</dd>
+                </div>
+
+                <div>
+                    <dt>Підкатегорія</dt>
+                    <dd>
+                        {{ scheme.subcategory|default:"Не вказано" }}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Автор</dt>
+                    <dd>
+                        {{ scheme.author|default:"Не вказано" }}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Складність</dt>
+                    <dd>
+                        {% if scheme.difficulty %}
+                            {{ scheme.get_difficulty_display }}
+                        {% else %}
+                            Не вказано
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Статус</dt>
+                    <dd>{{ scheme.get_status_display }}</dd>
+                </div>
+            </dl>
+
+            {% if scheme.description %}
+                <section class="detail-description">
+                    <h3>Опис</h3>
+                    <p>{{ scheme.description }}</p>
+                </section>
+            {% endif %}
+
+            <section>
+                <h3>Теги</h3>
+
+                <div class="tags">
+                    {% for tag in scheme.tags.all %}
+                        <span>{{ tag.name }}</span>
+                    {% empty %}
+                        <span>Теги не додані</span>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="requirements-section">
+                <div class="requirements-heading">
+                    <h3>Матеріали для схеми</h3>
+
+                    <div class="requirements-links">
+                        <a
+                            class="materials-page-link"
+                            href="{% url 'production:production_create' scheme.pk %}"
+                        >
+                            Створити виробництво
+                        </a>
+
+                        <form
+                            class="cart-build-form"
+                            method="post"
+                            action="{% url 'shop:cart_build' scheme.pk %}"
+                        >
+                            {% csrf_token %}
+
+                            <button
+                                class="cart-build-button"
+                                type="submit"
+                            >
+                                Сформувати кошик
+                            </button>
+                        </form>
+
+                        <a
+                            class="materials-page-link"
+                            href="{% url 'materials:scheme_material_create' scheme.pk %}"
+                        >
+                            + Додати матеріал
+                        </a>
+
+                        <a
+                            class="materials-page-link"
+                            href="{% url 'materials:material_list' %}"
+                        >
+                            Перейти до складу
+                        </a>
+                    </div>
+                </div>
+
+                {% with requirements=scheme.material_requirements.all %}
+                    {% if requirements %}
+                        <div class="requirements-table-wrapper">
+                            <table class="requirements-table">
+                                <thead>
+                                <tr>
+                                    <th>Матеріал</th>
+                                    <th>Потрібно</th>
+                                    <th>На складі</th>
+                                    <th>Стан</th>
+                                    <th>Дефіцит</th>
+                                    <th>Дії</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for requirement in requirements %}
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                {{ requirement.material.name }}
+                                            </strong>
+
+                                            {% if requirement.material.color_name %}
+                                                <small>
+                                                    {{ requirement.material.color_name }}
+
+                                                    {% if requirement.material.color_code %}
+                                                        /
+                                                        {{ requirement.material.color_code }}
+                                                    {% endif %}
+                                                </small>
+                                            {% endif %}
+
+                                            {% if requirement.notes %}
+                                                <small>
+                                                    {{ requirement.notes }}
+                                                </small>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {{ requirement.required_quantity }}
+                                            {{ requirement.material.get_unit_display }}
+                                        </td>
+
+                                        <td>
+                                            {{ requirement.material.quantity_in_stock }}
+                                            {{ requirement.material.get_unit_display }}
+                                        </td>
+
+                                        <td>
+                                            {% if requirement.available %}
+                                                <span class="availability available">
+                                                    Достатньо
+                                                </span>
+                                            {% else %}
+                                                <span class="availability unavailable">
+                                                    Недостатньо
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if requirement.shortage %}
+                                                {{ requirement.shortage }}
+                                                {{ requirement.material.get_unit_display }}
+                                            {% else %}
+                                                0
+                                                {{ requirement.material.get_unit_display }}
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="requirement-actions">
+                                            <a
+                                                class="requirement-edit-link"
+                                                href="{% url 'materials:scheme_material_update' requirement.pk %}"
+                                            >
+                                                Редагувати
+                                            </a>
+
+                                            <a
+                                                class="requirement-delete-link"
+                                                href="{% url 'materials:scheme_material_delete' requirement.pk %}"
+                                            >
+                                                Видалити
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="no-requirements">
+                            Для цієї схеми матеріали ще не додані.
+                        </p>
+                    {% endif %}
+                {% endwith %}
+            </section>
+
+            <div class="detail-actions">
+                <form
+                    class="favorite-form"
+                    method="post"
+                    action="{% url 'schemes:scheme_toggle_favorite' scheme.pk %}"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        class="favorite-button"
+                        type="submit"
+                    >
+                        {% if scheme.is_favorite %}
+                            ★ Прибрати з обраного
+                        {% else %}
+                            ☆ Додати до обраного
+                        {% endif %}
+                    </button>
+                </form>
+
+                {% if scheme.pdf_file %}
+                    <a
+                        class="primary-link"
+                        href="{{ scheme.pdf_file.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Відкрити PDF
+                    </a>
+                {% endif %}
+
+                <a
+                    class="secondary-link"
+                    href="{% url 'schemes:scheme_update' scheme.pk %}"
+                >
+                    Редагувати
+                </a>
+
+                <a
+                    class="danger-link"
+                    href="{% url 'schemes:scheme_delete' scheme.pk %}"
+                >
+                    Видалити
+                </a>
+            </div>
+        </div>
+        </article>
+</main>
+</body>
+</html>

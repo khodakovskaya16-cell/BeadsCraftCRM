@@ -1,0 +1,235 @@
+.materials-filter {
+    grid-template-columns: 2fr 1fr 1fr auto;
+}
+
+.material-table-card {
+    overflow: hidden;
+    margin-bottom: 50px;
+    background: #ffffff;
+    border-radius: 13px;
+    box-shadow: 0 5px 20px rgba(65, 46, 76, 0.1);
+}
+
+.material-table-wrapper {
+    overflow-x: auto;
+}
+
+.material-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.material-table th,
+.material-table td {
+    padding: 14px 15px;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee9f0;
+}
+
+.material-table th {
+    font-size: 13px;
+    color: #655b69;
+    background: #f2edf4;
+}
+
+.material-table tbody tr:hover {
+    background: #faf7fb;
+}
+
+.material-table small {
+    display: block;
+    margin-top: 3px;
+    color: #777077;
+}
+
+.stock-status {
+    display: inline-block;
+    padding: 5px 9px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 20px;
+}
+
+.stock-low {
+    color: #9f2016;
+    background: #fff1f0;
+}
+
+.stock-enough {
+    color: #276735;
+    background: #edf8ef;
+}
+
+@media (max-width: 850px) {
+    .materials-filter {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .materials-filter {
+        grid-template-columns: 1fr;
+    }
+}
+.material-actions-cell {
+    white-space: nowrap;
+}
+
+.material-edit-link {
+    display: inline-block;
+    padding: 8px 12px;
+    color: #704f82;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1px solid #704f82;
+    border-radius: 7px;
+}
+
+.material-edit-link:hover {
+    color: #ffffff;
+    background: #704f82;
+}
+
+.material-form-card {
+    max-width: 720px;
+}
+
+.material-form-card input[type="number"] {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    font: inherit;
+    color: #2c2c2c;
+    border: 1px solid #cfc7d3;
+    border-radius: 7px;
+    background: #ffffff;
+}
+
+.material-form-card input[type="number"]:focus {
+    border-color: #704f82;
+    outline: 2px solid rgba(112, 79, 130, 0.15);
+}
+.catalog-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.secondary-create-link {
+    display: inline-block;
+    padding: 10px 16px;
+    color: #704f82;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1px solid #704f82;
+    border-radius: 8px;
+}
+
+.secondary-create-link:hover {
+    color: #ffffff;
+    background: #704f82;
+}
+
+.material-income-link,
+.material-writeoff-link {
+    display: inline-block;
+    margin: 2px;
+    padding: 7px 9px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.material-income-link {
+    color: #276735;
+    border: 1px solid #3f8a50;
+}
+
+.material-income-link:hover {
+    color: #ffffff;
+    background: #3f8a50;
+}
+
+.material-writeoff-link {
+    color: #9f2016;
+    border: 1px solid #b42318;
+}
+
+.material-writeoff-link:hover {
+    color: #ffffff;
+    background: #b42318;
+}
+
+.movement-form-card {
+    max-width: 650px;
+}
+
+.movement-material-info {
+    margin-bottom: 22px;
+    padding: 15px 17px;
+    background: #f5f0f7;
+    border-radius: 9px;
+}
+
+.movement-material-info p {
+    margin: 6px 0;
+}
+
+.movement-warning {
+    padding: 12px 15px;
+    color: #8a1c13;
+    background: #fff1f0;
+    border-radius: 8px;
+}
+
+.movement-writeoff-button {
+    background: #b42318 !important;
+}
+
+.movement-writeoff-button:hover {
+    background: #8f1d14 !important;
+}
+
+.movement-filter {
+    grid-template-columns: 2fr 1fr auto;
+}
+
+.movement-type {
+    display: inline-block;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 20px;
+}
+
+.movement-receipt {
+    color: #276735;
+    background: #edf8ef;
+}
+
+.movement-writeoff {
+    color: #9f2016;
+    background: #fff1f0;
+}
+
+@media (max-width: 850px) {
+    .movement-filter {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .movement-filter {
+        grid-template-columns: 1fr;
+    }
+
+    .catalog-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Головна панель — BeadsCraft CRM</title>
+
+    <link
+    rel="stylesheet"
+    href="{% static 'schemes/css/styles.css' %}"
+>
+
+<link
+    rel="stylesheet"
+    href="{% static 'dashboard/css/styles.css' %}"
+>
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Головна панель керування</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="/admin/"
+        >
+            Адміністрування
+        </a>
+    </div>
+</header>
+
+{% include "includes/main_navigation.html" %}
+
+<main class="container dashboard-page">
+    <section class="dashboard-welcome">
+        <h2>Огляд системи</h2>
+
+        <p>
+            Керуйте схемами, матеріалами,
+            замовленнями та виробництвом
+            з однієї сторінки.
+        </p>
+    </section>
+
+    <section class="module-grid">
+        <a
+            class="module-card"
+            href="{% url 'schemes:scheme_list' %}"
+        >
+            <span class="module-icon">◆</span>
+
+            <h3>Бібліотека схем</h3>
+
+            <p>
+                Каталог, пошук, статуси та обрані схеми
+            </p>
+        </a>
+
+        <a
+            class="module-card"
+            href="{% url 'materials:material_list' %}"
+        >
+            <span class="module-icon">●</span>
+
+            <h3>Матеріали</h3>
+
+            <p>
+                Склад, залишки та журнал руху
+            </p>
+        </a>
+
+        <a
+            class="module-card"
+            href="{% url 'shop:order_list' %}"
+        >
+            <span class="module-icon">▣</span>
+
+            <h3>Магазин</h3>
+
+            <p>
+                Кошики та оформлені замовлення
+            </p>
+        </a>
+
+        <a
+            class="module-card"
+            href="{% url 'production:production_list' %}"
+        >
+            <span class="module-icon">⚙</span>
+
+            <h3>Виробництво</h3>
+
+            <p>
+                Планування, списання та виконання
+            </p>
+        </a>
+    </section>
+
+    <section class="statistics-grid">
+        <article class="stat-card">
+            <span class="stat-title">
+                Схеми
+            </span>
+
+            <strong>
+                {{ schemes_count }}
+            </strong>
+
+            <small>
+                Обраних: {{ favorite_schemes_count }}
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-title">
+                Матеріали
+            </span>
+
+            <strong>
+                {{ materials_count }}
+            </strong>
+
+            <small>
+                Малий запас: {{ low_stock_count }}
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-title">
+                Замовлення
+            </span>
+
+            <strong>
+                {{ orders_count }}
+            </strong>
+
+            <small>
+                Нових: {{ new_orders_count }}
+            </small>
+        </article>
+
+        <article class="stat-card">
+            <span class="stat-title">
+                Активне виробництво
+            </span>
+
+            <strong>
+                {{ active_productions_count }}
+            </strong>
+
+            <small>
+                Завершено: {{ completed_productions_count }}
+            </small>
+        </article>
+    </section>
+
+    <section class="dashboard-columns">
+        <article class="dashboard-panel">
+            <div class="panel-heading">
+                <h3>Матеріали з малим запасом</h3>
+
+                <a
+                    href="{% url 'materials:material_list' %}?stock=low"
+                >
+                    Відкрити склад
+                </a>
+            </div>
+
+            {% if low_stock_materials %}
+                <div class="dashboard-list">
+                    {% for material in low_stock_materials %}
+                        <div class="dashboard-list-item">
+                            <div>
+                                <strong>
+                                    {{ material.name }}
+                                </strong>
+
+                                <small>
+                                    {% if material.color_name %}
+                                        {{ material.color_name }}
+                                    {% else %}
+                                        Без кольору
+                                    {% endif %}
+                                </small>
+                            </div>
+
+                            <span class="dashboard-warning">
+                                {{ material.quantity_in_stock }}
+                                {{ material.get_unit_display }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="dashboard-empty">
+                    Усі матеріали мають достатній запас.
+                </p>
+            {% endif %}
+        </article>
+
+        <article class="dashboard-panel">
+            <div class="panel-heading">
+                <h3>Активне виробництво</h3>
+
+                <a
+                    href="{% url 'production:production_list' %}"
+                >
+                    Усі завдання
+                </a>
+            </div>
+
+            {% if active_productions %}
+                <div class="dashboard-list">
+                    {% for production in active_productions %}
+                        <a
+                            class="dashboard-list-item dashboard-item-link"
+                            href="{% url 'production:production_detail' production.pk %}"
+                        >
+                            <div>
+                                <strong>
+                                    {{ production.production_number }}
+                                </strong>
+
+                                <small>
+                                    {{ production.scheme.title }}
+                                </small>
+                            </div>
+
+                            <span>
+                                {{ production.get_status_display }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="dashboard-empty">
+                    Активних виробничих завдань немає.
+                </p>
+            {% endif %}
+        </article>
+    </section>
+
+    <section class="dashboard-columns">
+        <article class="dashboard-panel">
+            <div class="panel-heading">
+                <h3>Останні замовлення</h3>
+
+                <a
+                    href="{% url 'shop:order_list' %}"
+                >
+                    Усі замовлення
+                </a>
+            </div>
+
+            {% if recent_orders %}
+                <div class="dashboard-list">
+                    {% for order in recent_orders %}
+                        <a
+                            class="dashboard-list-item dashboard-item-link"
+                            href="{% url 'shop:order_success' order.pk %}"
+                        >
+                            <div>
+                                <strong>
+                                    {{ order.order_number }}
+                                </strong>
+
+                                <small>
+                                    {{ order.cart.scheme.title }}
+                                </small>
+                            </div>
+
+                            <span>
+                                {{ order.get_status_display }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="dashboard-empty">
+                    Замовлень ще немає.
+                </p>
+            {% endif %}
+        </article>
+
+        <article class="dashboard-panel">
+            <div class="panel-heading">
+                <h3>Останній рух матеріалів</h3>
+
+                <a
+                    href="{% url 'materials:stock_movement_list' %}"
+                >
+                    Відкрити журнал
+                </a>
+            </div>
+
+            {% if recent_movements %}
+                <div class="dashboard-list">
+                    {% for movement in recent_movements %}
+                        <div class="dashboard-list-item">
+                            <div>
+                                <strong>
+                                    {{ movement.material.name }}
+                                </strong>
+
+                                <small>
+                                    {{ movement.created_at|date:"d.m.Y H:i" }}
+                                </small>
+                            </div>
+
+                            <span>
+                                {% if movement.movement_type == "receipt" %}
+                                    +
+                                {% else %}
+                                    −
+                                {% endif %}
+
+                                {{ movement.quantity }}
+                                {{ movement.material.get_unit_display }}
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="dashboard-empty">
+                    Операцій руху ще немає.
+                </p>
+            {% endif %}
+        </article>
+    </section>
+</main>
+</body>
+</html>

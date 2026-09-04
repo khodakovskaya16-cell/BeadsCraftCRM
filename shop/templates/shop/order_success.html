@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Замовлення оформлено — BeadsCraft CRM</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'schemes/css/styles.css' %}?v=10"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'shop/css/styles.css' %}?v=1"
+    >
+</head>
+
+<body>
+<header class="site-header">
+    <div class="container header-content">
+        <div>
+            <h1>BeadsCraft CRM</h1>
+            <p>Замовлення оформлено</p>
+        </div>
+
+        <a
+            class="admin-link"
+            href="{% url 'schemes:scheme_list' %}"
+        >
+            Бібліотека схем
+        </a>
+    </div>
+</header>
+
+<main class="container success-page">
+    <section class="success-card">
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h2>Замовлення успішно оформлено</h2>
+
+        <p class="order-number">
+            Номер:
+            <strong>{{ order.order_number }}</strong>
+        </p>
+
+        <div class="order-information">
+            <p>
+                <strong>Отримувач:</strong>
+                {{ order.customer_name }}
+            </p>
+
+            <p>
+                <strong>Телефон:</strong>
+                {{ order.phone }}
+            </p>
+
+            {% if order.email %}
+                <p>
+                    <strong>Email:</strong>
+                    {{ order.email }}
+                </p>
+            {% endif %}
+
+            {% if order.delivery_address %}
+                <p>
+                    <strong>Доставка:</strong>
+                    {{ order.delivery_address }}
+                </p>
+            {% endif %}
+        </div>
+
+        <h3>Матеріали</h3>
+
+        <ul class="success-items">
+            {% for item in items %}
+                <li>
+                    {{ item.material_name }}
+
+                    {% if item.color_name %}
+                        — {{ item.color_name }}
+                    {% endif %}
+
+                    :
+                    <strong>
+                        {{ item.quantity }}
+                        {{ item.unit_label }}
+                    </strong>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <p class="success-note">
+            Після фактичного отримання матеріалів
+            додайте їх на склад через операцію
+            «Надходження».
+        </p>
+
+        <a
+            class="checkout-link"
+            href="{% url 'materials:material_list' %}"
+        >
+            Перейти до складу
+        </a>
+    </section>
+</main>
+</body>
+</html>
